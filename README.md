@@ -1,4 +1,4 @@
-# 🚀 DUO SYSTEMS — Lead Finder & Outreach Center
+# 🚀 OutreachOS — Lead Finder & Outreach Center
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
 [![React](https://img.shields.io/badge/React-18.3.1-61DAFB.svg?style=flat&logo=React&logoColor=black)](https://reactjs.org/)
