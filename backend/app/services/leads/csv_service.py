@@ -249,6 +249,7 @@ class CsvService:
 
         headers = [
             "Business Name",
+            "Contact Name",
             "Category",
             "Address",
             "City",
@@ -261,13 +262,17 @@ class CsvService:
             "Status",
             "Place ID",
             "Source",
+            "Campaign",
             "Created At"
         ]
         writer.writerow(headers)
 
         for l in leads:
+            contact_name = l.contacts[0].name if (l.contacts and len(l.contacts) > 0) else ""
+            campaign_name = l.campaign.name if l.campaign else ""
             writer.writerow([
                 l.business_name,
+                contact_name,
                 l.category or l.business_type or "Business",
                 l.formatted_address or l.address or "",
                 l.city or "",
@@ -280,6 +285,7 @@ class CsvService:
                 l.lead_status or "NEW",
                 l.place_id,
                 l.source or "Google Places",
+                campaign_name,
                 l.created_at.strftime("%Y-%m-%d %H:%M") if l.created_at else ""
             ])
 

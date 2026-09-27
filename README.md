@@ -1,4 +1,4 @@
-# 🌌 AntiGravity — Autonomous B2B Lead Discovery & Outreach OS
+# 🌌 AntiGravity — B2B Lead Finder, Campaign Manager & Google Sheets Sync
 
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB.svg?style=flat&logo=Python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
@@ -9,7 +9,7 @@
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00.svg?style=flat&logo=SQLAlchemy&logoColor=white)](https://www.sqlalchemy.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://opensource.org/licenses/MIT)
 
-> **AntiGravity is an enterprise-grade autonomous B2B client acquisition and outreach system that discovers high-intent commercial prospects across any global market, scores them dynamically, and dispatches personalized email campaigns with background queue throttling.**
+> **AntiGravity is an enterprise-grade B2B client acquisition system that discovers high-intent commercial prospects across global markets, groups them into structured campaigns, exports clean CSVs, and synchronizes seamlessly with Google Sheets.**
 
 ---
 
@@ -33,15 +33,16 @@
 
 ## 🌟 Project Overview
 
-Traditional B2B lead generation relies on fragmented SaaS subscriptions, brittle web scrapers, and black-box email deliverability services. **AntiGravity** replaces this disjointed stack with an owned, end-to-end client prospecting and cold email pipeline powered by official Google APIs and an event-driven background task manager.
+Traditional B2B prospecting relies on expensive data subscriptions, messy manual copy-pasting, and brittle spreadsheets. **AntiGravity** replaces this fragmented process with an owned, streamlined lead generation and campaign workflow powered by official Google Places APIs, deterministic deduplication, and bi-directional Google Sheets integration.
 
 - **Discovers verified businesses worldwide** by querying the Google Places API (New) across granular geographic zones and sub-districts.
-- **Eliminates duplicates deterministically** using unique Google Place IDs and SHA-256 multi-attribute composite hashes.
+- **Eliminates duplicates deterministically** using unique Google Place IDs and multi-attribute composite keys.
 - **Calculates transparent lead scores (0–100)** to triage prospect readiness based on contact completeness, operational stability, and review signals.
-- **Normalizes external CSV spreadsheets** through fuzzy column detection, regex phone/email sanitation, and primary contact extraction.
-- **Enables instant manual lead entries** into any target campaign directly from the CRM interface with live scoring and contact linking.
-- **Dispatches throttled email campaigns** via official Gmail OAuth 2.0 with dynamic placeholder tokenization, suppression protection, and asynchronous pause/resume controls.
-- **Synchronizes data bi-directionally** with Google Sheets for zero-friction CRM reporting and operational handoff.
+- **Organizes prospects into targeted campaigns** categorized by industry vertical, geographic market, or pipeline stage.
+- **Enables instant CSV downloads** with one click across individual campaigns or the entire global lead database.
+- **Synchronizes data bi-directionally** with Google Sheets with automatic tab generation, place deduplication, and KPI summaries.
+- **Imports external CSV spreadsheets** through fuzzy column mapping, phone/email sanitation, and primary contact extraction.
+- **Supports manual lead entry** to add high-touch prospects directly to any campaign with live scoring.
 
 ---
 
@@ -50,33 +51,33 @@ Traditional B2B lead generation relies on fragmented SaaS subscriptions, brittle
 ### 🎯 1. Universal Lead Discovery & Multi-Area Prospecting
 - Scans commercial niches (Hostels & PGs, Clinics, Law Firms, Tech Studios, Real Estate) across any city worldwide.
 - Executes multi-area sub-district scans (e.g., Koramangala, Indiranagar, HSR Layout) in a single unified operation.
-- Applies automated deduplication by Google Place ID to prevent re-querying and save API quotas.
+- Applies automated deduplication by Google Place ID to prevent redundant writes and save API quotas.
 - Automatically falls back to high-fidelity local simulation when running in sandbox environments without an active billing key.
 
-### 🧮 2. Objective Multi-Factor Lead Scoring (0–100)
-- **High Intent (70–100)**: Operational status confirmed, verified telephone, live web domain, complete address, and positive review density.
-- **Medium Intent (40–69)**: Verified address and telephone, but missing independent website or low review density.
-- **Low Intent (0–39)**: Incomplete profile requiring manual research before outbound investment.
-- Generates transparent, auditable score reasons stored in JSON format for clear pipeline visibility.
+### 📁 2. B2B Campaign Organization & Pipeline Management
+- Group leads into structured campaigns (e.g., "Bangalore Hostels & PGs", "Dubai Luxury Real Estate").
+- Track lead outreach status across standard stages: *Not Contacted*, *Contacted*, *Replied*, *Interested*, *Proposal Sent*, *Won*, *Lost*.
+- Drill down into campaign-specific leads with instant filters, CRM notes, tags, and follow-up schedules.
+- Add prospects manually to any campaign with immediate contact person linkage and dynamic qualification.
 
-### 📁 3. Intelligent CSV Importer & Normalization Engine
+### 💾 3. 1-Click CSV File Download & Bulk Export
+- Download ready-to-use CSV files directly from the **Campaigns** grid for any individual campaign.
+- Export all discovered leads or filtered subsets directly from the **Leads** table or **Exports** hub.
+- Exported columns include: Business Name, Contact Name, Category, Address, City, Phone, Website, Email, Google Rating, Review Count, Lead Score, Status, Place ID, Source, Campaign, and Creation Timestamp.
+- Compliant RFC 4180 CSV generation handles UTF-8 formatting and special characters safely.
+
+### 📊 4. Native Google Sheets Synchronization
+- Direct OAuth 2.0 and Service Account integration with the Google Sheets API (`https://www.googleapis.com/auth/spreadsheets`).
+- Pre-checks existing Place IDs in the target worksheet to ensure zero duplicate row insertions.
+- Automatically manages dedicated campaign worksheets (e.g., dedicated tabs per campaign).
+- Optional automated KPI Dashboard tab summarizing total prospects, review ratings, and priority distribution.
+- Logs full export history with direct clickable spreadsheet URLs for auditability.
+
+### 📥 5. Intelligent CSV Importer & Normalization Engine
 - Auto-detects custom headers (`Hostel Name`, `Contact Person`, `Email Address`, `Phone`, `City`, `Category`, `Website`).
-- Supports RFC-compliant email standards including Gmail plus-addressing (`user+tag@domain.com`).
-- Extracts primary contact persons into a relational `lead_contacts` table to power personalized email salutations.
-- Provides a 1-click transition from CSV completion directly into campaign queue staging.
-
-### ✍️ 4. Manual Lead Entry & Campaign Allocation
-- Allows on-the-fly addition of individual high-touch prospects from the **Leads** or **Campaigns** views.
-- Automatically links contact person records (`name`, `first_name`) to enable immediate dynamic rendering.
-- Dynamically assigns newly created prospects to active campaigns and increments pending queue counters.
-- Computes real-time lead score ratings and CRM outreach states upon submission.
-
-### 📬 5. Throttled Gmail Outreach Engine & Token Templating
-- Uses official Google OAuth 2.0 (`https://www.googleapis.com/auth/gmail.send`) — **zero SMTP passwords or third-party relay risk**.
-- Renders dynamic token placeholders: `{{name}}`, `{{first_name}}`, `{{company}}`, `{{city}}`, `{{category}}`, `{{phone}}`, `{{website}}`.
-- Runs preflight validations to filter suppressed addresses, duplicate entries, and malformed emails prior to queue dispatch.
-- Features a rate-throttled queue worker (1–60 emails/min) with live background pause, resume, and cancellation controls.
-- Enables single-recipient test email previews to verify formatting and variable rendering before public distribution.
+- Supports RFC-compliant email standards including plus-addressing (`user+tag@domain.com`).
+- Extracts primary contact persons into relational records to preserve owner/manager identities.
+- Immediately scores, deduplicates, and commits imported records into active campaigns.
 
 ---
 
@@ -87,279 +88,249 @@ flowchart TD
     subgraph Client ["Frontend Layer (React 18 + Vite + Tailwind CSS)"]
         UI[AntiGravity Dashboard]
         LF[Lead Discovery]
-        IMP[CSV Normalizer]
+        CAMP[Campaign Manager]
         MLE[Manual Lead Entry]
-        CAMP[Campaign Orchestrator]
-        QM[Email Queue Monitor]
-        CRM[Lead CRM & History]
+        IMP[CSV Normalizer & Importer]
+        CRM[Lead CRM & Filters]
+        EXP[Sheets & CSV Export Hub]
     end
 
-    subgraph Server ["Application Backend (FastAPI + Asyncio)"]
+    subgraph Server ["Application Backend (FastAPI + SQLAlchemy)"]
         ROUTER[REST API Endpoints]
         PLACES[Google Places Service]
-        PARSER[CSV Mapping Engine]
-        SCORER[Lead Scoring Engine]
-        CAMPSERV[Campaign Manager]
-        QUEUE[Async Queue Worker]
-        GMAIL[Gmail OAuth Provider]
-        SHEETS[Google Sheets Exporter]
+        PARSER[CSV Normalization Engine]
+        SCORING[Multi-Factor Scoring Engine]
+        DEDUP[Place ID Deduplicator]
+        SHEETS_SVC[Google Sheets Sync Service]
+        DB_LAYER[(SQLite / PostgreSQL Database)]
     end
 
-    subgraph Storage ["Data Persistence Layer"]
-        DB[(PostgreSQL / SQLite Database)]
-        AUDIT[(Audit Logs & Event Stream)]
-        SUPPRESS[(Suppression & Blocklists)]
-    end
-
-    subgraph Google ["Google Cloud Platform APIs"]
-        G_PLACES[Places API New]
-        G_MAIL[Gmail API v1]
+    subgraph External ["External Services & APIs"]
+        G_PLACES[Google Places API New]
         G_SHEETS[Google Sheets API v4]
+        LOCAL_CSV[Local CSV Download]
     end
 
     UI --> ROUTER
-    LF --> PLACES --> G_PLACES
-    IMP --> PARSER --> SCORER --> DB
-    MLE --> SCORER --> DB
-    CAMP --> CAMPSERV --> DB
-    QM --> QUEUE --> GMAIL --> G_MAIL
-    CRM --> SHEETS --> G_SHEETS
-    ROUTER --> DB
-    ROUTER --> AUDIT
-    QUEUE --> SUPPRESS
+    LF -->|Search Query| ROUTER
+    CAMP -->|Manage Campaigns| ROUTER
+    MLE -->|Create Lead| ROUTER
+    IMP -->|Upload CSV| ROUTER
+    EXP -->|Download CSV / Sync| ROUTER
+
+    ROUTER --> PLACES
+    ROUTER --> PARSER
+    ROUTER --> SCORING
+    ROUTER --> SHEETS_SVC
+
+    PLACES -->|Text Search & Details| G_PLACES
+    PLACES --> DEDUP
+    PARSER --> DEDUP
+    DEDUP --> DB_LAYER
+    SCORING --> DB_LAYER
+
+    SHEETS_SVC -->|Deduplicated Append| G_SHEETS
+    ROUTER -->|Stream CSV| LOCAL_CSV
 ```
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Technologies | Purpose |
-|---|---|---|
-| **Frontend UI** | React 18, TypeScript, Vite, Tailwind CSS, Lucide Icons | Responsive client dashboard & live queue monitors |
-| **Backend API** | Python 3.11+, FastAPI, Pydantic v2, Uvicorn, Asyncio | High-performance asynchronous REST API & queue workers |
-| **Database & ORM** | SQLAlchemy 2.0, Alembic, SQLite (dev) / PostgreSQL 14+ (prod) | Relational CRM models, foreign key cascading, and migrations |
-| **Google Cloud APIs** | Google Places API (New), Gmail API (v1), Google Sheets API (v4) | Commercial place discovery, outbound email, and spreadsheet export |
-| **Authentication** | Google OAuth 2.0 (`google-auth-oauthlib`, `google-api-python-client`) | Secure, passwordless Gmail authorization |
-| **DevOps & Containers**| Docker, Docker Compose, Vercel | Production containerization and edge frontend deployment |
+| Layer | Technologies |
+| :--- | :--- |
+| **Frontend Framework** | React 18, TypeScript, Vite 5, Tailwind CSS |
+| **Icons & UI** | Lucide React, Glassmorphism Slate-950 UI System |
+| **Backend Framework** | FastAPI (Python 3.11 / 3.12), Pydantic v2, Uvicorn |
+| **Database & ORM** | SQLAlchemy 2.0, SQLite (default) / PostgreSQL (production ready) |
+| **External Integrations** | Google Places API (New), Google Sheets API v4 (OAuth 2.0) |
+| **Data Processing** | Python CSV Streaming, Fuzzy Column Matching, Regex Data Sanitizers |
 
 ---
 
 ## 📦 Prerequisites
 
-Ensure the following tools are installed on your system:
-
-| Dependency | Minimum Version | Recommended Version |
-|---|---|---|
-| **Python** | `3.11.0` | `3.12.x` |
-| **Node.js** | `v18.0.0` | `v20.x LTS` |
-| **Package Manager**| `npm 9.x` (or `pnpm 8+`) | `npm 10.x` |
-| **Git** | `2.38.0` | Latest |
+- **Python**: Version `3.11` or `3.12` installed.
+- **Node.js**: Version `18.x` or `20.x` with `npm`.
+- **Google Cloud Console Account**: With Places API (New) and Google Sheets API enabled (optional: demo mode available out of the box).
 
 ---
 
 ## 🚀 Quick Start
 
-### 1. Clone & Configure Environment
+### 1. Clone the Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/pk1519/OutreachOS.git
-cd OutreachOS
+git clone https://github.com/pk1519/campaign.git
+cd campaign
+```
 
-# Create environment file from template
+### 2. Configure Backend Environment
+
+Create `backend/.env` with your settings:
+
+```bash
+cd backend
 cp .env.example .env
 ```
 
-*(On Windows PowerShell: `Copy-Item .env.example .env`)*
-
-Configure your `.env` parameters:
+Edit `backend/.env`:
 ```env
-GOOGLE_PLACES_API_KEY=AIzaSy...your_google_places_api_key
-GOOGLE_CLIENT_ID=your_oauth_client_id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_oauth_client_secret
+GOOGLE_PLACES_API_KEY=AIzaSyYourGooglePlacesKeyHere
+GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+ENABLE_DEMO_SIMULATION=true
 DATABASE_URL=sqlite:///./duo_leads.db
-FRONTEND_URL=http://localhost:5173
 ```
 
----
-
-### 2. Launch the Backend API (FastAPI)
+### 3. Install Backend Dependencies & Start Server
 
 ```bash
-# Create and activate Python virtual environment
 python -m venv venv
+# Windows:
+.\venv\Scripts\activate
+# Linux/macOS:
+# source venv/bin/activate
 
-# Windows (PowerShell):
-.\venv\Scripts\Activate.ps1
-
-# Linux / macOS:
-source venv/bin/activate
-
-# Install backend dependencies
-pip install -r backend/requirements.txt
-
-# Start backend server with hot-reload
-cd backend
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000 --reload
 ```
-- **REST API Health**: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
-- **Interactive Swagger Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
----
+*The API is now running at `http://127.0.0.1:8000` (Swagger docs: `http://127.0.0.1:8000/docs`).*
 
-### 3. Launch the Frontend (React + Vite)
+### 4. Install Frontend Dependencies & Start App
 
 In a separate terminal:
+
 ```bash
 cd frontend
-
-# Install Node dependencies
 npm install
-
-# Start development server
 npm run dev
 ```
-- **Web Application Dashboard**: [http://localhost:5173](http://localhost:5173)
+
+*The frontend application is now running at `http://127.0.0.1:5173`.*
 
 ---
 
 ## 🐳 Docker Deployment
 
-To run the entire ecosystem (PostgreSQL 14, FastAPI Backend, and React Frontend) with persistent volumes:
+Run the complete AntiGravity stack using Docker Compose:
 
 ```bash
-# Build and start all services in detached mode
-docker-compose up --build -d
+# Build and run containers in detached mode
+docker-compose up -d --build
 
-# View live container logs
+# View real-time logs
 docker-compose logs -f
 
-# Gracefully stop services
+# Shut down stack
 docker-compose down
 ```
-
-| Service | Port | Description |
-|---|---|---|
-| **Frontend Dashboard** | `http://localhost:3000` | Production React SPA served via Nginx |
-| **Backend REST API** | `http://localhost:8000` | FastAPI server running under Uvicorn |
-| **PostgreSQL Database** | `localhost:5432` | Relational storage for leads, campaigns, and queues |
 
 ---
 
 ## ⚙️ Configuration
 
-| Variable | Default Value | Description |
-|---|---|---|
-| `DATABASE_URL` | `sqlite:///./duo_leads.db` | PostgreSQL connection URI or local SQLite file path |
-| `GOOGLE_PLACES_API_KEY` | `""` | GCP API Key with Places API (New) enabled |
-| `GOOGLE_CLIENT_ID` | `""` | GCP OAuth 2.0 Web Client ID for Gmail and Sheets |
-| `GOOGLE_CLIENT_SECRET` | `""` | GCP OAuth 2.0 Web Client Secret |
-| `GOOGLE_REDIRECT_URI` | `http://localhost:8000/api/sheets/oauth-callback` | Registered OAuth redirect endpoint |
-| `GMAIL_SENDER_EMAIL` | `contact.devworks7@gmail.com` | Authenticated outbound Gmail sender |
-| `FRONTEND_URL` | `http://localhost:5173` | Allowed CORS frontend origin |
-| `SECRET_KEY` | `duo-systems-super-secret-production-key-2026` | Cryptographic session and CSRF key |
-| `MAX_AREAS_PER_SEARCH` | `15` | Safety ceiling for multi-area batch discovery |
-| `MAX_RESULTS_PER_SEARCH`| `100` | Maximum leads stored per discovery operation |
-| `ENABLE_DEMO_SIMULATION`| `true` | Enables high-fidelity simulation if no API key is supplied |
+| Variable | Default | Description |
+| :--- | :--- | :--- |
+| `GOOGLE_PLACES_API_KEY` | `""` | Google Cloud API key restricted to Places API (New) |
+| `GOOGLE_CLIENT_ID` | `""` | OAuth 2.0 Client ID for Google Sheets authorization |
+| `GOOGLE_CLIENT_SECRET` | `""` | OAuth 2.0 Client Secret for Google Sheets authorization |
+| `ENABLE_DEMO_SIMULATION`| `true` | Falls back to realistic lead generation if Places key is empty |
+| `DATABASE_URL` | `sqlite:///./duo_leads.db` | Database connection string (SQLite or PostgreSQL) |
+| `MAX_AREAS_PER_SEARCH` | `10` | Safety limit on sub-areas evaluated per search |
+| `MAX_RESULTS_PER_SEARCH`| `60` | Maximum businesses retrieved per single query execution |
+| `VITE_API_URL` (Frontend) | `""` (proxied) | Production backend URL when deploying frontend on Vercel |
 
 ---
 
 ## 📡 API Reference
 
-### 🔍 Discovery & Searches
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/search` | Execute multi-area search via Google Places API (New) with Place ID deduplication. |
-| `GET` | `/api/search/history` | Retrieve historical search logs with result and duplicate counters. |
+### 🔍 Lead Discovery
+- `POST /api/search` — Discover commercial leads by category, city, country, and sub-areas.
+- `GET /api/search/history` — Retrieve previous discovery execution logs and metadata.
 
-### 👥 Leads & CRM Management
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/leads` | Filter, paginate, and search leads by campaign, score, and contact status. |
-| `POST` | `/api/leads` | **Manually create a new lead** with instant scoring and campaign linkage. |
-| `POST` | `/api/leads/import/detect-columns` | Upload CSV and automatically detect matching column headers. |
-| `POST` | `/api/leads/import` | Ingest CSV records with deduplication, contact extraction, and scoring. |
-| `GET` | `/api/leads/{id}` | Fetch granular lead record, contact details, notes, and outreach logs. |
-| `PATCH` | `/api/leads/{id}` | Update lead fields, business status, website, or campaign affiliation. |
-| `PATCH` | `/api/leads/{id}/crm` | Update lead CRM pipeline status (`Not Contacted`, `Contacted`, `Replied`, `Converted`). |
-| `DELETE`| `/api/leads/{id}` | Delete a lead and cascade orphan associations. |
+### 👥 Leads & CRM
+- `GET /api/leads` — Query paginated leads with campaign, priority, and text search filters.
+- `POST /api/leads` — Add a lead manually with contact person and instant scoring.
+- `PATCH /api/leads/{id}/crm` — Update lead priority, outreach status, follow-up date, and rep notes.
+- `POST /api/leads/export/csv` — Stream RFC-compliant CSV containing selected or all leads.
+- `POST /api/leads/import/detect-columns` — Upload CSV to auto-detect and preview column mappings.
+- `POST /api/leads/import` — Import and score leads from confirmed CSV mappings.
+- `DELETE /api/leads/{id}` — Permanently remove a lead from the database.
 
-### 🚀 Outreach & Campaigns
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/campaigns` | List all campaigns with real-time recipient and progress counters. |
-| `POST` | `/api/campaigns` | Create a campaign with personalized subject and body templates. |
-| `POST` | `/api/campaigns/preflight-validate` | Validate lead email formats, check duplicates, and filter suppression lists. |
-| `POST` | `/api/campaigns/{id}/prepare` | Lock recipients and configure dispatch rate for sending. |
-| `POST` | `/api/campaigns/{id}/test-email` | Dispatch a rendered test preview strictly to a verified test address. |
-| `POST` | `/api/campaigns/{id}/send` | Launch the asynchronous throttled email queue worker. |
-| `POST` | `/api/campaigns/{id}/pause` | Pause a running queue dispatch. |
-| `POST` | `/api/campaigns/{id}/resume` | Resume a paused queue worker. |
-| `POST` | `/api/campaigns/{id}/cancel` | Abort a campaign and purge pending queue jobs. |
+### 📁 Campaigns
+- `GET /api/campaigns` — List all active lead generation campaigns with lead counts.
+- `POST /api/campaigns` — Create a new B2B lead campaign.
+- `GET /api/campaigns/{id}` — Get single campaign details and parameters.
+- `DELETE /api/campaigns/{id}` — Delete a campaign and its lead associations.
 
-### 📊 Queue, Metrics & Database Admin
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/email-queue` | Real-time queue snapshot (pending, processing, sent, failed, skipped). |
-| `GET` | `/api/email-history` | Searchable log of dispatched messages with Gmail Message IDs. |
-| `GET` | `/api/dashboard` | High-level metrics for leads, campaigns, conversion rates, and queue health. |
-| `POST` | `/api/settings/reset-data` | **Safe data reset endpoint**: wipes leads and campaigns while preserving OAuth credentials. |
+### 📊 Google Sheets Sync
+- `GET /api/sheets/status` — Check server-side Google Sheets OAuth connection state.
+- `POST /api/sheets/connect-demo` — Enable instant local demo connection for spreadsheet testing.
+- `POST /api/sheets/export` — Sync campaign leads to Google Sheets with Place ID deduplication.
+- `GET /api/sheets/destinations` — Retrieve history of all synchronized spreadsheets.
+
+### ⚙️ System Settings
+- `GET /api/settings` — Get current system settings and masked API key status.
+- `POST /api/settings` — Update API keys, limits, and simulation preferences.
+- `POST /api/settings/reset-data` — Wipe all leads, campaigns, and search history to start fresh.
 
 ---
 
 ## 🔄 Core Workflow
 
-```text
-  [1. Discover or Import]
-         │
-         ├──► Places API Discovery ──────┐
-         ├──► CSV Spreadsheet Upload ───┼──► [2. Normalize & Score (0–100)]
-         └──► Manual Lead Form ──────────┘                 │
-                                                           ▼
-  [5. Completed & Logged] ◄── [4. Throttled Queue] ◄── [3. Template & Validate]
+```
+1. Discover Leads (Lead Finder) ──► 2. Score & Deduplicate (0-100) ──► 3. Organize in Campaign
+             ▲                                                                    │
+             │                                                                    ▼
+4. Upload CSV / Manual Entry ────────────────────────────────────────► 5. Export Data
+                                                                          ├── Download CSV
+                                                                          └── Sync to Google Sheets
 ```
 
-1. **Ingest Prospects**: Discover leads through Google Places API, import external CSVs with fuzzy column detection, or manually enter high-priority leads.
-2. **Normalize & Score**: Automatic deduplication (by Google Place ID or email) and objective scoring (0–100) based on operational metrics.
-3. **Template & Preflight**: Draft personalized templates with dynamic tokens (`{{name}}`, `{{company}}`, `{{city}}`, `{{category}}`) and run preflight safety checks.
-4. **Throttled Dispatch**: Background worker sends personalized messages via Gmail OAuth with rate limiting (e.g. 10/min) and exponential backoff retry.
-5. **Track & Sync**: Results are logged in Email History with Gmail message IDs and synced to Google Sheets for client CRM tracking.
+1. **Lead Discovery**: Enter your business niche (e.g., *"Hostels & PGs"*) and target city (*"Bangalore"*). The system scans sub-districts using Google Places API (New).
+2. **Deterministic Deduplication**: Place IDs ensure identical businesses are never duplicated in the database.
+3. **Transparent Scoring**: Prospects receive a 0–100 score based on operational status, contact availability, ratings, and web presence.
+4. **Campaign Grouping**: Leads are structured into dedicated campaigns for targeted tracking.
+5. **Instant Export**:
+   - Click **Download CSV** on any campaign or lead view for offline analysis or spreadsheet work.
+   - Click **Sync to Google Sheets** to push deduplicated leads directly into a live Google Spreadsheet.
 
 ---
 
 ## 🧪 Testing & Verification
 
-Run the comprehensive end-to-end test suite:
+Run the automated verification suite to validate lead discovery, scoring, and CSV generation:
 
 ```bash
-# Run pytest unit and integration tests
-pytest -v
+# Run backend test suite
+cd backend
+..\venv\Scripts\python.exe -m pytest -v
 
-# Run targeted CSV import, scoring, and queue verification script
-python backend/test_csv_and_campaign.py
+# Test CSV export endpoint
+..\venv\Scripts\python.exe -c "import requests; r = requests.post('http://127.0.0.1:8000/api/leads/export/csv', json={}); print('Status:', r.status_code, 'Bytes:', len(r.text))"
 
-# Verify frontend TypeScript types and Vite production build
-cd frontend
-npm run build
+# Verify frontend production build
+cd ../frontend
+cmd /c npm run build
 ```
 
 ---
 
 ## 🛡 Security & Compliance
 
-- **Zero Stored Passwords**: Communicates strictly via short-lived OAuth 2.0 access tokens refreshed directly via Google servers (`auth/gmail.send`).
-- **Complete Secret Isolation**: Environment variables, local database files (`*.db`), and OAuth token files (`credentials.json`) are strictly git-ignored.
-- **Suppression Protection**: Preflight validations automatically screen out unsubscribed or blocked emails before queuing.
-- **Comprehensive Audit Trail**: Every lead creation, campaign lifecycle event, and settings modification is recorded in the `audit_logs` table.
+- **Backend-Only Secrets**: All Google API keys and OAuth secrets remain strictly on the backend and are never sent to the browser.
+- **Git-Ignored Credentials**: `.env`, `duo_leads.db`, token files, and `secrets/` folders are strictly excluded in `.gitignore`.
+- **Deduplication Safeguards**: Place ID verification prevents redundant writes and ensures idempotency across Google Sheets exports.
+- **Audit Logging**: Every lead import, export, and campaign action is permanently recorded in the `audit_logs` database table.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for complete terms.
+Distributed under the **MIT License**. See `LICENSE` for more information.
 
 ---
 
-<p align="center">
-  <b>Built by Priyanshu — Duo Systems Technical Automation Studio</b>
-</p>
+**Built by Priyanshu / AntiGravity**

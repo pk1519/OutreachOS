@@ -13,10 +13,11 @@ import {
 import { api } from '../api/client';
 
 interface ImportedLeadsProps {
-  onNavigateToCreateCampaign?: () => void;
+  onNavigateToLeads?: () => void;
+  onNavigateToSheets?: () => void;
 }
 
-export const ImportedLeads: React.FC<ImportedLeadsProps> = ({ onNavigateToCreateCampaign }) => {
+export const ImportedLeads: React.FC<ImportedLeadsProps> = ({ onNavigateToLeads, onNavigateToSheets }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [csvContent, setCsvContent] = useState<string>('');
   const [headers, setHeaders] = useState<string[]>([]);
@@ -290,13 +291,22 @@ export const ImportedLeads: React.FC<ImportedLeadsProps> = ({ onNavigateToCreate
             >
               Upload Another CSV
             </button>
-            {onNavigateToCreateCampaign && (
+            {onNavigateToLeads && (
               <button
-                onClick={onNavigateToCreateCampaign}
-                className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
+                onClick={onNavigateToLeads}
+                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2"
               >
-                <Send className="w-3.5 h-3.5" />
-                <span>Launch Campaign with These Leads</span>
+                <Users className="w-3.5 h-3.5" />
+                <span>View Discovered Leads</span>
+              </button>
+            )}
+            {onNavigateToSheets && (
+              <button
+                onClick={onNavigateToSheets}
+                className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                <span>Sync to Google Sheets</span>
               </button>
             )}
           </div>

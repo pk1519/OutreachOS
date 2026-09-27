@@ -7,7 +7,8 @@ import {
   Calendar,
   Layers,
   Sparkles,
-  ArrowRight
+  ArrowRight,
+  Download
 } from 'lucide-react';
 import { SheetsConnect } from '../components/SheetsConnect';
 import { SheetsExportDialog } from '../components/SheetsExportDialog';
@@ -43,6 +44,14 @@ export const GoogleSheets: React.FC = () => {
     fetchCampaigns();
   }, []);
 
+  const handleDownloadCsv = async () => {
+    try {
+      await api.downloadLeadsCsv(undefined, selectedCampaignId || undefined, `duo_leads_${new Date().toISOString().slice(0, 10)}.csv`);
+    } catch (err: any) {
+      alert(`CSV download error: ${err.message}`);
+    }
+  };
+
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Top Banner */}
@@ -52,19 +61,28 @@ export const GoogleSheets: React.FC = () => {
             <FileSpreadsheet className="w-4 h-4" />
             <span>Primary Export Hub</span>
           </div>
-          <h2 className="text-xl font-extrabold text-white">Google Sheets Lead Management</h2>
+          <h2 className="text-xl font-extrabold text-white">Google Sheets & CSV Export</h2>
           <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Directly synchronize leads to Google Sheets. Place IDs are cross-checked before every write to guarantee duplicate prevention, while preserving separate Google-derived data and Duo Systems CRM data.
+            Directly synchronize leads to Google Sheets with Place ID deduplication, or download offline CSV files formatted for instant CRM importing.
           </p>
         </div>
 
-        <button
-          onClick={() => setIsExportDialogOpen(true)}
-          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all"
-        >
-          <FileSpreadsheet className="w-4 h-4" />
-          <span>Launch Export Wizard</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleDownloadCsv}
+            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-extrabold text-xs border border-slate-700/80 flex items-center gap-2 transition-all shadow-sm"
+          >
+            <Download className="w-4 h-4 text-cyan-400" />
+            <span>Download CSV</span>
+          </button>
+          <button
+            onClick={() => setIsExportDialogOpen(true)}
+            className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg shadow-emerald-600/30 flex items-center gap-2 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Launch Sheets Wizard</span>
+          </button>
+        </div>
       </div>
 
       {/* Google OAuth Connection Widget */}

@@ -149,6 +149,18 @@ export const api = {
       return res.blob();
     }),
 
+  downloadLeadsCsv: async (leadIds?: number[], campaignId?: number, filename?: string): Promise<void> => {
+    const blob = await api.exportLeadsCsv(leadIds, campaignId);
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || `leads_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  },
+
   generateOutreachDraft: (id: number, template: string): Promise<{ draft_message: string }> =>
     fetch(`${BASE_URL}/leads/${id}/generate-outreach?template_type=${template}`, {
       method: 'POST'
@@ -308,5 +320,10 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
-    }).then(res => handleResponse(res))
+    }).then(res => handleResponse(res)),
+
+  resetData: (confirm: boolean = true): Promise<{ status: string; message: string }> =>
+    fetch(`${BASE_URL}/settings/reset-data?confirm=${confirm}`, {
+      method: 'POST'
+    }).then(res => handleResponse<{ status: string; message: string }>(res))
 };

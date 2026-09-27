@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileSpreadsheet, ChevronLeft, ChevronRight, Filter, Plus } from 'lucide-react';
+import { Search, FileSpreadsheet, ChevronLeft, ChevronRight, Filter, Plus, Download } from 'lucide-react';
 import { LeadTable } from '../components/LeadTable';
 import { LeadDrawer } from '../components/LeadDrawer';
 import { SheetsExportDialog } from '../components/SheetsExportDialog';
@@ -106,6 +106,17 @@ export const Leads: React.FC<LeadsPageProps> = ({ initialCampaignId }) => {
     }
   };
 
+  const handleDownloadCsv = async () => {
+    try {
+      const ids = selectedLeadIds.length > 0 ? selectedLeadIds : undefined;
+      const campId = selectedCampaignId || undefined;
+      const filename = `duo_leads_${selectedCampaignId ? `campaign_${selectedCampaignId}_` : ''}${new Date().toISOString().slice(0, 10)}.csv`;
+      await api.downloadLeadsCsv(ids, campId, filename);
+    } catch (err: any) {
+      alert(`CSV download error: ${err.message}`);
+    }
+  };
+
   return (
     <div className="p-8 space-y-6 max-w-7xl mx-auto">
       {/* Header */}
@@ -118,6 +129,15 @@ export const Leads: React.FC<LeadsPageProps> = ({ initialCampaignId }) => {
         </div>
 
         <div className="flex items-center gap-2.5">
+          <button
+            onClick={handleDownloadCsv}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-cyan-300 font-extrabold text-xs transition-all border border-slate-700/80"
+            title="Download leads as CSV"
+          >
+            <Download className="w-4 h-4 text-cyan-400" />
+            <span>Download CSV</span>
+          </button>
+
           <button
             onClick={() => setIsAddLeadModalOpen(true)}
             className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all"

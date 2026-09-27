@@ -8,18 +8,18 @@ import {
   CheckCircle2,
   Sparkles,
   AlertCircle,
-  Mail,
   RefreshCw,
   ExternalLink,
   Lock,
-  FileCheck
+  FileSpreadsheet,
+  Trash2
 } from 'lucide-react';
 import { api } from '../api/client';
-import { GmailStatus } from '../types';
+import { GoogleConnectionStatus } from '../types';
 
 export const Settings: React.FC = () => {
   const [settingsData, setSettingsData] = useState<any | null>(null);
-  const [gmailStatus, setGmailStatus] = useState<GmailStatus | null>(null);
+  const [sheetsStatus, setSheetsStatus] = useState<GoogleConnectionStatus | null>(null);
   const [placesKey, setPlacesKey] = useState('');
   const [clientId, setClientId] = useState('');
   const [clientSecret, setClientSecret] = useState('');
@@ -29,16 +29,16 @@ export const Settings: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [actionNotice, setActionNotice] = useState<{ success: boolean; message: string } | null>(null);
-  const [connectingGmail, setConnectingGmail] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   const fetchSettingsAndStatus = async () => {
     try {
       const [data, gStatus] = await Promise.all([
         api.getSettings(),
-        api.getGmailStatus()
+        api.getGoogleStatus()
       ]);
       setSettingsData(data);
-      setGmailStatus(gStatus);
+      setSheetsStatus(gStatus);
       setMaxAreas(data.max_areas_per_search || 10);
       setMaxResults(data.max_results_per_search || 60);
       setDemoSimulation(data.enable_demo_simulation !== undefined ? data.enable_demo_simulation : true);
@@ -49,55 +49,42 @@ export const Settings: React.FC = () => {
 
   useEffect(() => {
     fetchSettingsAndStatus();
-
-    // Check URL parameters for OAuth returns
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('gmail_connected') === 'true') {
-      setActionNotice({ success: true, message: 'Gmail OAuth connected successfully!' });
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else if (urlParams.get('gmail_error')) {
-      setActionNotice({
-        success: false,
-        message: decodeURIComponent(urlParams.get('gmail_error') || 'Google authorization error.')
-      });
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
   }, []);
 
-  const handleConnectGmail = async () => {
-    setConnectingGmail(true);
-    setActionNotice(null);
+  const handleConnectSheetsDemo = async () => {
     try {
-      const res = await api.getGmailConnectUrl();
-      if (res.configured && res.auth_url) {
-        window.location.href = res.auth_url;
-      } else {
-        // Fallback to local connection
-        await api.simulateConnectGmail();
-        setActionNotice({
-          success: true,
-          message: 'Connected contact.devworks7@gmail.com with Gmail Send scope.'
-        });
-        await fetchSettingsAndStatus();
-      }
+      const res = await api.connectDemoSheets();
+      setSheetsStatus(res);
+      setActionNotice({ success: true, message: 'Connected Google Sheets successfully!' });
     } catch (err: any) {
-      setActionNotice({
-        success: false,
-        message: err.message || 'Could not connect Gmail. Verify credentials.json location.'
-      });
-    } finally {
-      setConnectingGmail(false);
+      setActionNotice({ success: false, message: `Connection failed: ${err.message}` });
     }
   };
 
-  const handleDisconnectGmail = async () => {
-    if (!confirm('Are you sure you want to disconnect Gmail? Active campaigns will not be able to send emails.')) return;
+  const handleDisconnectSheets = async () => {
+    if (!confirm('Are you sure you want to disconnect Google Sheets?')) return;
     try {
-      await api.disconnectGmail();
-      setActionNotice({ success: true, message: 'Gmail disconnected.' });
+      await api.disconnectSheets();
+      setSheetsStatus({ is_connected: false, has_refresh_token: false });
+      setActionNotice({ success: true, message: 'Google Sheets disconnected.' });
+    } catch (err: any) {
+      setActionNotice({ success: false, message: `Disconnect failed: ${err.message}` });
+    }
+  };
+
+  const handleResetData = async () => {
+    const confirmation = prompt('Type RESET to delete all leads, campaigns, and search history from the database:');
+    if (confirmation !== 'RESET') return;
+
+    setIsResetting(true);
+    try {
+      const res = await api.resetData(true);
+      setActionNotice({ success: true, message: res.message || 'All lead data reset successfully.' });
       await fetchSettingsAndStatus();
     } catch (err: any) {
-      setActionNotice({ success: false, message: err.message || 'Error disconnecting Gmail.' });
+      setActionNotice({ success: false, message: `Reset error: ${err.message}` });
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -134,7 +121,7 @@ export const Settings: React.FC = () => {
       <div>
         <h1 className="text-2xl font-extrabold text-white tracking-tight">System & Integration Settings</h1>
         <p className="text-xs text-slate-400 mt-0.5">
-          Configure Gmail OAuth, Google Places API (New), Google Sheets, and CRM security ceilings.
+          Configure Google Places API (New), Google Sheets Integration, and Search Ceilings.
         </p>
       </div>
 
@@ -162,105 +149,71 @@ export const Settings: React.FC = () => {
         </div>
       )}
 
-      {/* Gmail OAuth Integration Card */}
+      {/* Google Sheets Integration Card */}
       <div className="p-6 rounded-2xl bg-slate-900/90 border border-slate-800 shadow-xl space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-              <Mail className="w-5 h-5" />
+            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <FileSpreadsheet className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-base font-extrabold text-white">Gmail API Integration</h2>
+              <h2 className="text-base font-extrabold text-white">Google Sheets Integration</h2>
               <p className="text-xs text-slate-400 mt-0.5">
-                Official Google OAuth 2.0 Gmail sending flow for B2B outreach campaigns.
+                Direct spreadsheet export with Place ID deduplication and campaign tabs.
               </p>
             </div>
           </div>
 
           <div>
-            {gmailStatus?.is_connected ? (
+            {sheetsStatus?.is_connected ? (
               <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-emerald-400 bg-emerald-950/80 border border-emerald-800/60">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 Connected
               </span>
             ) : (
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-amber-400 bg-amber-950/80 border border-amber-800/60">
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span>
-                Disconnected
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold text-cyan-400 bg-cyan-950/80 border border-cyan-800/60">
+                <span className="w-2 h-2 rounded-full bg-cyan-400"></span>
+                Ready to Connect
               </span>
             )}
           </div>
         </div>
 
-        {/* Gmail Metadata Info */}
+        {/* Sheets Metadata Info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
           <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Gmail Sender Account</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Account / Identity</span>
             <span className="font-mono text-cyan-400 font-semibold">
-              {gmailStatus?.account_email || 'contact.devworks7@gmail.com'}
+              {sheetsStatus?.user_email || 'partner@duosystems.com (Demo)'}
             </span>
           </div>
 
           <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800">
-            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Authorized Scope</span>
+            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">Spreadsheet Scope</span>
             <span className="font-mono text-slate-200">
-              https://www.googleapis.com/auth/gmail.send
+              https://www.googleapis.com/auth/spreadsheets
             </span>
           </div>
-        </div>
-
-        {/* Credentials file status */}
-        <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2">
-            <FileCheck className="w-4 h-4 text-emerald-400" />
-            <span className="text-slate-300">
-              OAuth Credentials:{' '}
-              {gmailStatus?.credentials_file_found ? (
-                <strong className="text-emerald-400">Detected securely in backend/secrets/</strong>
-              ) : (
-                <strong className="text-amber-400">Place credentials.json in backend/secrets/google/</strong>
-              )}
-            </span>
-          </div>
-          <span className="text-[10px] font-mono text-slate-400 bg-slate-800 px-2 py-0.5 rounded">
-            Git-Ignored
-          </span>
         </div>
 
         {/* Connect / Disconnect Buttons */}
         <div className="flex items-center gap-3 pt-2">
-          {gmailStatus?.is_connected ? (
-            <>
-              <button
-                type="button"
-                disabled={connectingGmail}
-                onClick={handleConnectGmail}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center gap-2"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${connectingGmail ? 'animate-spin' : ''}`} />
-                <span>Reconnect Gmail</span>
-              </button>
-              <button
-                type="button"
-                onClick={handleDisconnectGmail}
-                className="px-4 py-2 bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-bold transition-all"
-              >
-                Disconnect Gmail
-              </button>
-            </>
+          {sheetsStatus?.is_connected ? (
+            <button
+              type="button"
+              onClick={handleDisconnectSheets}
+              className="px-4 py-2 bg-rose-950 hover:bg-rose-900 text-rose-300 border border-rose-800/60 rounded-xl text-xs font-bold transition-all"
+            >
+              Disconnect Google Sheets
+            </button>
           ) : (
             <button
               type="button"
-              disabled={connectingGmail}
-              onClick={handleConnectGmail}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2"
+              onClick={handleConnectSheetsDemo}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-extrabold uppercase tracking-wider shadow-lg shadow-emerald-600/30 transition-all flex items-center gap-2"
             >
-              {connectingGmail ? (
-                <RefreshCw className="w-4 h-4 animate-spin" />
-              ) : (
-                <Mail className="w-4 h-4" />
-              )}
-              <span>Connect Gmail (contact.devworks7@gmail.com)</span>
+              <FileSpreadsheet className="w-4 h-4" />
+              <span>Connect Google Sheets</span>
             </button>
           )}
         </div>
@@ -368,7 +321,7 @@ export const Settings: React.FC = () => {
             <Lock className="w-4 h-4 text-emerald-400" />
             <span>Tokens and API keys are stored securely on the backend and never exposed to the frontend.</span>
           </div>
-          <span className="font-mono text-slate-400">Duo Systems v1.0</span>
+          <span className="font-mono text-slate-400">AntiGravity / Duo Systems</span>
         </div>
 
         {/* Submit */}
@@ -383,6 +336,26 @@ export const Settings: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* Danger Zone: Reset Data */}
+      <div className="p-6 rounded-2xl bg-rose-950/20 border border-rose-800/40 shadow-xl space-y-3">
+        <div className="flex items-center gap-2.5 text-rose-400">
+          <Trash2 className="w-5 h-5" />
+          <h2 className="text-sm font-extrabold">Data Management & Reset</h2>
+        </div>
+        <p className="text-xs text-slate-400">
+          Wipe all discovered leads, campaigns, and search logs to start fresh. Google credentials are kept intact.
+        </p>
+        <button
+          type="button"
+          onClick={handleResetData}
+          disabled={isResetting}
+          className="px-4 py-2 rounded-xl bg-rose-900/40 hover:bg-rose-900 text-rose-200 border border-rose-700/60 text-xs font-bold transition-all flex items-center gap-2"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          <span>{isResetting ? 'Resetting...' : 'Reset All Lead Data'}</span>
+        </button>
+      </div>
     </div>
   );
 };

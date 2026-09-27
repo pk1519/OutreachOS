@@ -4,11 +4,7 @@ import { Topbar } from './components/Topbar';
 import { Dashboard } from './pages/Dashboard';
 import { FindLeads } from './pages/FindLeads';
 import { Campaigns } from './pages/Campaigns';
-import { CreateCampaign } from './pages/CreateCampaign';
-import { EmailQueue } from './pages/EmailQueue';
-import { EmailHistory } from './pages/EmailHistory';
 import { ImportedLeads } from './pages/ImportedLeads';
-import { SuppressionList } from './pages/SuppressionList';
 import { Leads } from './pages/Leads';
 import { GoogleSheets } from './pages/GoogleSheets';
 import { Analytics } from './pages/Analytics';
@@ -46,7 +42,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-slate-950 text-slate-100 font-sans antialiased">
-      {/* Sidebar with DUO SYSTEMS branding & live Gmail status */}
+      {/* Sidebar with Lead Finder, Campaigns & Google Sheets branding */}
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Main Content Area */}
@@ -68,27 +64,20 @@ export const App: React.FC = () => {
             <Leads initialCampaignId={selectedCampaignIdForLeads} />
           )}
 
-          {/* Outreach Center Pages */}
+          {/* Campaign & Lead Import Pages */}
           {activeTab === 'campaigns' && (
             <Campaigns
               onSelectCampaignForLeads={handleSelectCampaignForLeads}
-              onNavigateToCreate={() => setActiveTab('create-campaign')}
-              onNavigateToQueue={() => setActiveTab('email-queue')}
             />
           )}
-          {activeTab === 'create-campaign' && (
-            <CreateCampaign
-              onNavigateToQueue={() => setActiveTab('email-queue')}
-            />
-          )}
-          {activeTab === 'email-queue' && <EmailQueue />}
-          {activeTab === 'email-history' && <EmailHistory />}
           {activeTab === 'import-leads' && (
-            <ImportedLeads onNavigateToCreateCampaign={() => setActiveTab('create-campaign')} />
+            <ImportedLeads
+              onNavigateToLeads={() => setActiveTab('leads')}
+              onNavigateToSheets={() => setActiveTab('sheets')}
+            />
           )}
-          {activeTab === 'suppression-list' && <SuppressionList />}
 
-          {/* Data & Admin Pages */}
+          {/* Google Sheets, Search History & Settings */}
           {activeTab === 'sheets' && <GoogleSheets />}
           {activeTab === 'analytics' && <Analytics />}
           {activeTab === 'search-history' && <SearchHistory />}
