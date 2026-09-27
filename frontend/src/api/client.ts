@@ -15,7 +15,8 @@ import {
   SheetDestination
 } from '../types';
 
-const BASE_URL = '/api';
+const API_HOST = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const BASE_URL = API_HOST ? `${API_HOST}/api` : '/api';
 
 async function handleResponse<T>(res: Response): Promise<T> {
   if (!res.ok) {
