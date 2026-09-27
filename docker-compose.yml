@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: duo_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: duo_admin
+      POSTGRES_PASSWORD: duo_secure_password_2026
+      POSTGRES_DB: duo_leads
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U duo_admin -d duo_leads"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Future Redis Cache / Production Queue (Reserved)
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: duo_redis
+  #   restart: always
+  #   ports:
+  #     - "6379:6379"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: duo_backend
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://duo_admin:duo_secure_password_2026@postgres:5432/duo_leads
+      - GOOGLE_PLACES_API_KEY=${GOOGLE_PLACES_API_KEY}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI:-http://localhost:8000/api/integrations/gmail/callback}
+      - GMAIL_SENDER_EMAIL=${GMAIL_SENDER_EMAIL:-contact.devworks7@gmail.com}
+      - SECRET_KEY=${SECRET_KEY:-duo-systems-super-secret-key-2026}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5173}
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/secrets:/app/secrets:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: duo_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
