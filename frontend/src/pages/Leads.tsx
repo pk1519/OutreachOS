@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileSpreadsheet, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { Search, FileSpreadsheet, ChevronLeft, ChevronRight, Filter, Plus } from 'lucide-react';
 import { LeadTable } from '../components/LeadTable';
 import { LeadDrawer } from '../components/LeadDrawer';
 import { SheetsExportDialog } from '../components/SheetsExportDialog';
+import { ManualLeadModal } from '../components/ManualLeadModal';
 import { api } from '../api/client';
 import { Lead, Campaign } from '../types';
 
@@ -29,6 +30,7 @@ export const Leads: React.FC<LeadsPageProps> = ({ initialCampaignId }) => {
   const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
   const [activeDrawerLead, setActiveDrawerLead] = useState<Lead | null>(null);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
+  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
 
   const fetchCampaigns = async () => {
     try {
@@ -115,13 +117,23 @@ export const Leads: React.FC<LeadsPageProps> = ({ initialCampaignId }) => {
           </p>
         </div>
 
-        <button
-          onClick={() => setIsExportDialogOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md shadow-emerald-600/30 transition-all"
-        >
-          <FileSpreadsheet className="w-4 h-4" />
-          <span>Export to Google Sheets</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => setIsAddLeadModalOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Lead Manually</span>
+          </button>
+
+          <button
+            onClick={() => setIsExportDialogOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-md shadow-emerald-600/30 transition-all"
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Export to Google Sheets</span>
+          </button>
+        </div>
       </div>
 
       {/* Filter and Search Bar */}
@@ -256,6 +268,17 @@ export const Leads: React.FC<LeadsPageProps> = ({ initialCampaignId }) => {
         selectedLeadIds={selectedLeadIds.length > 0 ? selectedLeadIds : undefined}
         campaignId={selectedCampaignId || undefined}
         defaultWorksheetTitle="Duo Systems Leads"
+      />
+
+      {/* Manual Lead Entry Modal */}
+      <ManualLeadModal
+        isOpen={isAddLeadModalOpen}
+        onClose={() => setIsAddLeadModalOpen(false)}
+        defaultCampaignId={selectedCampaignId}
+        onLeadCreated={(newLead) => {
+          fetchLeads();
+          setActiveDrawerLead(newLead);
+        }}
       />
     </div>
   );

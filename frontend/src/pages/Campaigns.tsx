@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { FolderKanban, Plus, MapPin, Users, FileSpreadsheet, Trash2, Layers } from 'lucide-react';
+import { FolderKanban, Plus, MapPin, Users, FileSpreadsheet, Trash2, Layers, UserPlus } from 'lucide-react';
 import { api } from '../api/client';
 import { Campaign } from '../types';
 import { SheetsExportDialog } from '../components/SheetsExportDialog';
+import { ManualLeadModal } from '../components/ManualLeadModal';
 
 interface CampaignsPageProps {
   onSelectCampaignForLeads: (campaignId: number) => void;
@@ -19,6 +20,8 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [exportCampaign, setExportCampaign] = useState<Campaign | null>(null);
+  const [addLeadCampaignId, setAddLeadCampaignId] = useState<number | null>(null);
+  const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
 
   // New campaign form state
   const [name, setName] = useState('');
@@ -91,13 +94,25 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
             Organize discovery projects by business category, region, and target market.
           </p>
         </div>
-        <button
-          onClick={() => setIsCreateOpen(true)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Campaign</span>
-        </button>
+        <div className="flex items-center gap-2.5">
+          <button
+            onClick={() => {
+              setAddLeadCampaignId(null);
+              setIsAddLeadOpen(true);
+            }}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-extrabold text-xs transition-all border border-slate-700/80"
+          >
+            <UserPlus className="w-4 h-4 text-indigo-400" />
+            <span>Add Lead</span>
+          </button>
+          <button
+            onClick={() => setIsCreateOpen(true)}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs shadow-md shadow-indigo-600/30 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Campaign</span>
+          </button>
+        </div>
       </div>
 
       {/* Campaigns Grid */}
@@ -170,6 +185,16 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setAddLeadCampaignId(camp.id);
+                      setIsAddLeadOpen(true);
+                    }}
+                    className="p-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 transition-colors"
+                    title="Add a lead manually to this campaign"
+                  >
+                    <UserPlus className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => setExportCampaign(camp)}
                     className="p-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-colors"
@@ -284,6 +309,19 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
           defaultWorksheetTitle={exportCampaign.name}
         />
       )}
+
+      {/* Manual Lead Entry Modal */}
+      <ManualLeadModal
+        isOpen={isAddLeadOpen}
+        onClose={() => {
+          setIsAddLeadOpen(false);
+          setAddLeadCampaignId(null);
+        }}
+        defaultCampaignId={addLeadCampaignId}
+        onLeadCreated={() => {
+          fetchCampaigns();
+        }}
+      />
     </div>
   );
 };

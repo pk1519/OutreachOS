@@ -15,18 +15,20 @@ from app.models.campaign import Campaign
 from app.models.lead_note import LeadNote, LeadTag
 from app.models.lead_contact import LeadContact
 from app.models.email_message import EmailMessage
+from app.models.audit_log import AuditLog
 from app.schemas.lead_schema import (
     LeadUpdateCRM,
     LeadFilterParams
 )
 from app.services.lead_service import lead_service
-from app.services.leads.csv_service import csv_service
+from app.services.leads.csv_service import csv_service, EMAIL_REGEX
 from app.services.scoring_service import scoring_service
 
 router = APIRouter(prefix="/leads", tags=["Leads & CRM Management"])
 
 class LeadCreateRequest(BaseModel):
     business_name: str
+    contact_name: Optional[str] = None
     business_type: Optional[str] = "General"
     category: Optional[str] = None
     formatted_address: Optional[str] = None
@@ -202,36 +204,65 @@ def get_leads(
 
 @router.post("", response_model=dict, status_code=status.HTTP_201_CREATED)
 def create_lead(data: LeadCreateRequest, db: Session = Depends(get_db)):
-    """Manually creates a new lead with scoring and CRM initialization."""
-    # Deterministic place_id
+    """Manually creates a new lead with scoring, contact details, campaign linkage, and CRM initialization."""
     import hashlib
-    place_id = f"manual_{hashlib.sha256(f'{data.business_name}_{data.city}_{data.email}'.encode('utf-8')).hexdigest()[:24]}"
+    clean_biz = (data.business_name or "").strip()
+    if not clean_biz:
+        raise HTTPException(status_code=400, detail="Business / Company name is required.")
+
+    clean_email = data.email.strip().lower() if data.email and data.email.strip() else None
+
+    # Validate email regex if email provided
+    if clean_email and not EMAIL_REGEX.match(clean_email):
+        raise HTTPException(status_code=400, detail=f"Invalid email address '{clean_email}'.")
+
+    # Deterministic place_id
+    hash_str = f"{clean_biz}_{data.city or 'Bangalore'}_{clean_email or ''}"
+    place_id = f"manual_{hashlib.sha256(hash_str.encode('utf-8')).hexdigest()[:24]}"
 
     existing = db.query(Lead).filter(Lead.place_id == place_id).first()
+    if not existing and clean_email:
+        existing = db.query(Lead).filter(Lead.email == clean_email).first()
+
     if existing:
-        raise HTTPException(status_code=400, detail="This lead already exists.")
+        raise HTTPException(status_code=400, detail=f"A lead with this name/email already exists (#{existing.id}: {existing.business_name}).")
 
     lead = Lead(
         place_id=place_id,
-        business_name=data.business_name,
+        business_name=clean_biz,
         business_type=data.business_type or "General",
         category=data.category or data.business_type or "General",
         formatted_address=data.formatted_address,
         address=data.formatted_address,
         city=data.city or "Bangalore",
         country=data.country or "India",
-        phone=data.phone,
-        national_phone=data.phone,
-        website=data.website,
-        website_uri=data.website,
-        email=data.email,
+        phone=data.phone.strip() if data.phone else None,
+        national_phone=data.phone.strip() if data.phone else None,
+        website=data.website.strip() if data.website else None,
+        website_uri=data.website.strip() if data.website else None,
+        email=clean_email,
         campaign_id=data.campaign_id,
-        source="Manual",
+        source="Manual Entry",
         is_google_derived=False,
-        lead_status=data.lead_status or "NEW"
+        lead_status="QUALIFIED" if clean_email else (data.lead_status or "NEW")
     )
     db.add(lead)
     db.flush()
+
+    # If contact_name provided, store in LeadContact for template personalization
+    if data.contact_name and data.contact_name.strip():
+        c_name = data.contact_name.strip()
+        first_n = c_name.split()[0]
+        contact = LeadContact(
+            lead_id=lead.id,
+            name=c_name,
+            first_name=first_n,
+            email=lead.email,
+            phone=lead.phone,
+            role="Owner / Manager",
+            is_primary=True
+        )
+        db.add(contact)
 
     # Score lead
     score_val, priority, reasons = scoring_service.calculate_score({
@@ -253,6 +284,20 @@ def create_lead(data: LeadCreateRequest, db: Session = Depends(get_db)):
 
     outreach = OutreachRecord(lead_id=lead.id, status="Not Contacted", priority=priority)
     db.add(outreach)
+
+    # If campaign assigned, update campaign recipient stats
+    if data.campaign_id:
+        camp = db.query(Campaign).filter(Campaign.id == data.campaign_id).first()
+        if camp:
+            camp.total_recipients = (camp.total_recipients or 0) + 1
+            camp.pending_count = (camp.pending_count or 0) + 1
+
+    db.add(AuditLog(
+        action="LEAD_MANUALLY_CREATED",
+        details=f"Manually created lead '{lead.business_name}' assigned to Campaign #{lead.campaign_id or 'None'}",
+        user_email="contact.devworks7@gmail.com"
+    ))
+
     db.commit()
     db.refresh(lead)
 
