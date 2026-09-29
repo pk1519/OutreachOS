@@ -4,12 +4,18 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from app.database import get_db
 from app.models.campaign import Campaign
 from app.models.campaign_recipient import CampaignRecipient
 from app.models.lead import Lead
+from app.models.lead_score import LeadScore
+from app.models.outreach import OutreachRecord
+from app.models.lead_note import LeadNote, LeadTag
+from app.models.lead_contact import LeadContact
+from app.models.email_message import EmailMessage
+from app.models.search import SearchHistory
 from app.models.audit_log import AuditLog
 from app.services.campaigns.campaign_service import campaign_service
 from app.workers.email_worker import email_queue_manager
@@ -392,10 +398,29 @@ def add_leads_to_campaign(
     }
 
 @router.delete("/{campaign_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_campaign(campaign_id: int, db: Session = Depends(get_db)):
+async def delete_campaign(campaign_id: int, db: Session = Depends(get_db)):
+    """
+    Completely deletes the campaign and all its associated data from the database:
+    - All leads belonging to this campaign, its searches, or added as recipients
+    - All lead scores, outreach records, notes, tags, and contacts
+    - All campaign recipients and email messages
+    - All Google Sheet destinations linked to this campaign
+    - All search history records associated with this campaign
+    - The campaign record itself
+    """
     camp = db.query(Campaign).filter(Campaign.id == campaign_id).first()
     if not camp:
         raise HTTPException(status_code=404, detail="Campaign not found")
-    db.delete(camp)
-    db.commit()
+
+    # Stop any active background email queue for this campaign
+    try:
+        await email_queue_manager.cancel_campaign(campaign_id)
+    except Exception as e:
+        logger.warning(f"Notice while cancelling campaign background queue: {e}")
+
+    from app.services.campaign_service import campaign_service as base_campaign_service
+    success = base_campaign_service.delete_campaign(db, campaign_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Campaign not found")
+
     return None

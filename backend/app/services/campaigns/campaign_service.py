@@ -301,4 +301,9 @@ class CampaignService:
         db.refresh(campaign)
         return campaign
 
+    @staticmethod
+    def delete_campaign(db: Session, campaign_id: int) -> bool:
+        from app.services.campaign_service import campaign_service as base_service
+        return base_service.delete_campaign(db, campaign_id)
+
 campaign_service = CampaignService()

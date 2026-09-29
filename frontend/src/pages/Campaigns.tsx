@@ -9,7 +9,8 @@ import {
   Layers,
   UserPlus,
   Download,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 import { api } from '../api/client';
 import { Campaign } from '../types';
@@ -30,6 +31,7 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
   const [addLeadCampaignId, setAddLeadCampaignId] = useState<number | null>(null);
   const [isAddLeadOpen, setIsAddLeadOpen] = useState(false);
   const [downloadingId, setDownloadingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // New campaign form state
@@ -90,13 +92,16 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
   };
 
   const handleDeleteCampaign = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this campaign?')) return;
+    if (!confirm('Are you sure you want to delete this campaign? All leads, searches, outreach logs, and campaign data will be permanently removed from the database.')) return;
+    setDeletingId(id);
     try {
       await api.deleteCampaign(id);
-      fetchCampaigns();
-      showToast('Campaign deleted.');
+      await fetchCampaigns();
+      showToast('Campaign and all its data permanently deleted from database.');
     } catch (err: any) {
       alert(`Delete failed: ${err.message}`);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -201,10 +206,15 @@ export const Campaigns: React.FC<CampaignsPageProps> = ({
                   </div>
                   <button
                     onClick={() => handleDeleteCampaign(camp.id)}
-                    className="p-1 text-slate-400 hover:text-rose-400 transition-colors"
-                    title="Delete campaign"
+                    disabled={deletingId === camp.id}
+                    className="p-1 text-slate-400 hover:text-rose-400 disabled:opacity-50 transition-colors"
+                    title="Delete campaign and all its database data"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    {deletingId === camp.id ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-rose-400" />
+                    ) : (
+                      <Trash2 className="w-3.5 h-3.5" />
+                    )}
                   </button>
                 </div>
 

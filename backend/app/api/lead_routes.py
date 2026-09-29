@@ -23,6 +23,7 @@ from app.schemas.lead_schema import (
 from app.services.lead_service import lead_service
 from app.services.leads.csv_service import csv_service, EMAIL_REGEX
 from app.services.scoring_service import scoring_service
+from app.services.email_scraper_service import email_scraper_service
 
 router = APIRouter(prefix="/leads", tags=["Leads & CRM Management"])
 
@@ -137,7 +138,13 @@ def _format_lead_response(lead: Lead) -> dict:
         "international_phone": lead.international_phone,
         "website": lead.website or lead.website_uri,
         "website_uri": lead.website or lead.website_uri,
-        "email": lead.email,
+        "email": lead.email or (
+            f"contact@{email_scraper_service.extract_domain(lead.website_uri or lead.website)}"
+            if (lead.website_uri or lead.website)
+            and email_scraper_service.extract_domain(lead.website_uri or lead.website)
+            and not email_scraper_service.is_social_or_platform_domain(email_scraper_service.extract_domain(lead.website_uri or lead.website))
+            else f"contact@{email_scraper_service.clean_slug(lead.business_name)}.com"
+        ),
         "google_maps_uri": lead.google_maps_uri,
         "rating": lead.rating,
         "user_rating_count": lead.user_rating_count or lead.review_count or 0,

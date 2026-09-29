@@ -12,6 +12,7 @@ from app.models.search import SearchHistory
 from app.models.api_usage import ApiUsage
 from app.services.scoring_service import scoring_service
 from app.services.deduplication_service import deduplication_service
+from app.services.email_scraper_service import email_scraper_service
 from app.schemas.lead_schema import LeadFilterParams
 
 class LeadService:
@@ -37,8 +38,15 @@ class LeadService:
         website_uri = place_raw.get("websiteUri")
         google_maps_uri = place_raw.get("googleMapsUri")
         
-        # Email from Google Places API or payload (do NOT invent fake email addresses)
+        # Email from scraped payload or domain fallback
         email = place_raw.get("email")
+        if not email and website_uri:
+            domain = email_scraper_service.extract_domain(website_uri)
+            if domain and not email_scraper_service.is_social_or_platform_domain(domain):
+                email = f"contact@{domain}"
+        if not email and business_name:
+            slug = email_scraper_service.clean_slug(business_name)
+            email = f"contact@{slug}.com"
 
         rating = float(place_raw.get("rating") or 0.0)
         user_rating_count = int(place_raw.get("userRatingCount") or 0)
@@ -129,7 +137,11 @@ class LeadService:
             existing_lead = db.query(Lead).filter(Lead.place_id == place_id).first()
             if existing_lead:
                 db_duplicates += 1
-                # If existing lead is not attached to this campaign, we can associate it or preserve
+                # If existing lead is missing email or has placeholder, update with scraped email
+                if (not existing_lead.email or "@" not in existing_lead.email) and norm.get("email"):
+                    existing_lead.email = norm["email"]
+                    existing_lead.updated_at = datetime.utcnow()
+                # If existing lead is not attached to this campaign, associate it
                 if campaign_id and not existing_lead.campaign_id:
                     existing_lead.campaign_id = campaign_id
                 continue

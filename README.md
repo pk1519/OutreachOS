@@ -1,4 +1,4 @@
-# 🌌 AntiGravity — B2B Lead Finder, Campaign Manager & Google Sheets Sync
+# 🌌 DUO SYSTEMS — Enterprise B2B Lead Finder & Outreach Center
 
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-3776AB.svg?style=flat&logo=Python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110.0-009688.svg?style=flat&logo=FastAPI&logoColor=white)](https://fastapi.tiangolo.com)
@@ -9,75 +9,138 @@
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00.svg?style=flat&logo=SQLAlchemy&logoColor=white)](https://www.sqlalchemy.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat)](https://opensource.org/licenses/MIT)
 
-> **AntiGravity is an enterprise-grade B2B client acquisition system that discovers high-intent commercial prospects across global markets, groups them into structured campaigns, exports clean CSVs, and synchronizes seamlessly with Google Sheets.**
+> **Duo Systems** is a full-stack, enterprise-grade B2B client acquisition platform that automates lead discovery worldwide, calculates transparent qualification scores, manages multi-stage outreach campaigns, synchronizes seamlessly with Google Sheets, and sends personalized Gmail outreach with throttling safeguards.
+
+---
+
+<!-- ======================================================== -->
+<!-- 📸 HERO SCREENSHOT PLACEHOLDER                             -->
+<!-- Image path: docs/images/hero-dashboard.png               -->
+<!-- ======================================================== -->
+<p align="center">
+  <img src="docs/images/hero-dashboard.png" alt="Duo Systems Dashboard Preview" width="950" style="border-radius: 12px; border: 1px solid #1e293b; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);" />
+</p>
 
 ---
 
 ## 📑 Table of Contents
 
-- [🌟 Project Overview](#-project-overview)
-- [⚡ Core Capabilities](#-core-capabilities)
+- [🌟 Platform Highlights](#-platform-highlights)
+- [📸 Visual Tour & Core Features](#-visual-tour--core-features)
+  - [1. Universal Lead Discovery](#1-universal-lead-discovery--multi-area-scanning)
+  - [2. B2B Campaign Management & Deletion Engine](#2-b2b-campaign-management--complete-database-purge)
+  - [3. Lead Qualification & CRM](#3-lead-qualification--crm-pipeline)
+  - [4. Automated Gmail Outreach](#4-automated-gmail-outreach-engine)
+  - [5. Bi-Directional Google Sheets Sync](#5-bi-directional-google-sheets-sync)
+  - [6. CSV Importer & Normalization](#6-smart-csv-importer--normalization)
 - [🏗 System Architecture](#-system-architecture)
 - [🛠 Tech Stack](#-tech-stack)
-- [📦 Prerequisites](#-prerequisites)
-- [🚀 Quick Start](#-quick-start)
-- [🐳 Docker Deployment](#-docker-deployment)
-- [⚙️ Configuration](#️-configuration)
+- [🚀 Quick Start (Local Setup)](#-quick-start-local-setup)
+- [🌐 Zero-Cost 24/7 Production Deployment](#-zero-cost-247-production-deployment)
+- [⚙️ Configuration & Environment Variables](#️-configuration--environment-variables)
 - [📡 API Reference](#-api-reference)
-- [🔄 Core Workflow](#-core-workflow)
-- [🧪 Testing & Verification](#-testing--verification)
-- [🛡 Security & Compliance](#-security--compliance)
+- [🧪 Automated Test Suite](#-automated-test-suite)
+- [🖼️ Screenshot Guide (Where & How to Add Images)](#️-screenshot-guide)
 - [📄 License](#-license)
 
 ---
 
-## 🌟 Project Overview
+## 🌟 Platform Highlights
 
-Traditional B2B prospecting relies on expensive data subscriptions, messy manual copy-pasting, and brittle spreadsheets. **AntiGravity** replaces this fragmented process with an owned, streamlined lead generation and campaign workflow powered by official Google Places APIs, deterministic deduplication, and bi-directional Google Sheets integration.
-
-- **Discovers verified businesses worldwide** by querying the Google Places API (New) across granular geographic zones and sub-districts.
-- **Eliminates duplicates deterministically** using unique Google Place IDs and multi-attribute composite keys.
-- **Calculates transparent lead scores (0–100)** to triage prospect readiness based on contact completeness, operational stability, and review signals.
-- **Organizes prospects into targeted campaigns** categorized by industry vertical, geographic market, or pipeline stage.
-- **Enables instant CSV downloads** with one click across individual campaigns or the entire global lead database.
-- **Synchronizes data bi-directionally** with Google Sheets with automatic tab generation, place deduplication, and KPI summaries.
-- **Imports external CSV spreadsheets** through fuzzy column mapping, phone/email sanitation, and primary contact extraction.
-- **Supports manual lead entry** to add high-touch prospects directly to any campaign with live scoring.
+- 🎯 **Worldwide Commercial Scraping**: Query any business vertical across any city and sub-district using Google Places API (New).
+- 🛡️ **Zero Duplicate Guarantee**: Deterministic deduplication by Google Place ID prevents duplicate leads and conserves quota.
+- ⚡ **Transparent Duo Scoring (0–100)**: Evaluates prospect readiness based on contact availability, operational status, website presence, and ratings.
+- 📁 **Complete Campaign Lifecycles**: Organize leads into dedicated campaigns with instant CSV exports and a cascade deletion engine that cleanly wipes all related leads, scores, outreach logs, and search records.
+- ✉️ **Gmail API Outreach Queue**: Safe client outreach with variable templates (`{{company}}`, `{{city}}`), preflight validation, suppression filtering, test-email sandbox, and configurable throttling.
+- 📊 **Live Google Sheets Sync**: Push deduplicated leads into automated Google Sheets tabs with formatting and KPI summaries.
+- 🔌 **Built-in Mock Simulator**: Operates out of the box in sandbox mode with zero external credentials needed.
 
 ---
 
-## ⚡ Core Capabilities
+## 📸 Visual Tour & Core Features
 
-### 🎯 1. Universal Lead Discovery & Multi-Area Prospecting
-- Scans commercial niches (Hostels & PGs, Clinics, Law Firms, Tech Studios, Real Estate) across any city worldwide.
-- Executes multi-area sub-district scans (e.g., Koramangala, Indiranagar, HSR Layout) in a single unified operation.
-- Applies automated deduplication by Google Place ID to prevent redundant writes and save API quotas.
-- Automatically falls back to high-fidelity local simulation when running in sandbox environments without an active billing key.
+### 1. Universal Lead Discovery & Multi-Area Scanning
+Discover high-intent businesses across granular geographic districts (e.g. *Koramangala, Indiranagar, HSR Layout in Bangalore*). The engine extracts business name, address, phone numbers, websites, genuine emails via website enrichment, and ratings.
 
-### 📁 2. B2B Campaign Organization & Pipeline Management
-- Group leads into structured campaigns (e.g., "Bangalore Hostels & PGs", "Dubai Luxury Real Estate").
-- Track lead outreach status across standard stages: *Not Contacted*, *Contacted*, *Replied*, *Interested*, *Proposal Sent*, *Won*, *Lost*.
-- Drill down into campaign-specific leads with instant filters, CRM notes, tags, and follow-up schedules.
-- Add prospects manually to any campaign with immediate contact person linkage and dynamic qualification.
+<!-- 📸 SCREENSHOT: docs/images/lead-finder.png -->
+<p align="center">
+  <img src="docs/images/lead-finder.png" alt="Lead Discovery Screen" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
 
-### 💾 3. 1-Click CSV File Download & Bulk Export
-- Download ready-to-use CSV files directly from the **Campaigns** grid for any individual campaign.
-- Export all discovered leads or filtered subsets directly from the **Leads** table or **Exports** hub.
-- Exported columns include: Business Name, Contact Name, Category, Address, City, Phone, Website, Email, Google Rating, Review Count, Lead Score, Status, Place ID, Source, Campaign, and Creation Timestamp.
-- Compliant RFC 4180 CSV generation handles UTF-8 formatting and special characters safely.
+- Multi-area sub-district batch queries in a single operation.
+- Fallback website scraping for direct contact email extraction.
+- Automatic Place ID deduplication before database commit.
 
-### 📊 4. Native Google Sheets Synchronization
-- Direct OAuth 2.0 and Service Account integration with the Google Sheets API (`https://www.googleapis.com/auth/spreadsheets`).
-- Pre-checks existing Place IDs in the target worksheet to ensure zero duplicate row insertions.
-- Automatically manages dedicated campaign worksheets (e.g., dedicated tabs per campaign).
-- Optional automated KPI Dashboard tab summarizing total prospects, review ratings, and priority distribution.
-- Logs full export history with direct clickable spreadsheet URLs for auditability.
+---
 
-### 📥 5. Intelligent CSV Importer & Normalization Engine
-- Auto-detects custom headers (`Hostel Name`, `Contact Person`, `Email Address`, `Phone`, `City`, `Category`, `Website`).
-- Supports RFC-compliant email standards including plus-addressing (`user+tag@domain.com`).
-- Extracts primary contact persons into relational records to preserve owner/manager identities.
-- Immediately scores, deduplicates, and commits imported records into active campaigns.
+### 2. B2B Campaign Management & Complete Database Purge
+Organize discovered leads into structured client acquisition projects. View lead counts, monitor campaign statuses, download RFC 4180 CSV files, and purge campaigns cleanly.
+
+<!-- 📸 SCREENSHOT: docs/images/campaigns.png -->
+<p align="center">
+  <img src="docs/images/campaigns.png" alt="Campaign Management Screen" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+- **Cascade Purge Engine**: Deleting a campaign automatically purges all related leads, scores, notes, tags, contacts, recipient queues, email logs, search history, and sheet sync destinations to ensure zero database bloat.
+- **Visual Feedback**: Real-time loading spinners and confirmation dialogs prevent accidental or duplicate deletions.
+
+---
+
+### 3. Lead Qualification & CRM Pipeline
+Manage prospect relationships in an integrated CRM view. Filter by priority (*HOT*, *WARM*, *COLD*), pipeline status (*NEW*, *CONTACTED*, *REPLIED*, *CONVERTED*), and view transparent scoring breakdowns.
+
+<!-- 📸 SCREENSHOT: docs/images/leads-crm.png -->
+<p align="center">
+  <img src="docs/images/leads-crm.png" alt="Leads CRM Table and Score Breakdown" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+- Interactive slide-over lead drawer for notes, contacts, and metadata editing.
+- Instant CSV export of custom filtered subsets.
+- One-click copy for outreach drafts and phone numbers.
+
+---
+
+### 4. Automated Gmail Outreach Engine
+Reach out to qualified leads using official Google OAuth 2.0 sending credentials without third-party email trackers or data sharing.
+
+<!-- 📸 SCREENSHOT: docs/images/gmail-outreach.png -->
+<p align="center">
+  <img src="docs/images/gmail-outreach.png" alt="Gmail Outreach Queue and Personalization" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+- **Template Personalization**: Dynamic placeholders (`{{name}}`, `{{company}}`, `{{city}}`, `{{category}}`).
+- **Preflight Safety Validation**: Pre-checks for invalid formats, missing addresses, and duplicate emails before sending.
+- **Suppression Management**: Enforces global Do-Not-Contact and unsubscribed recipient lists.
+- **Test Email Sandbox**: Send test emails strictly to verified test accounts before launching queues.
+- **Rate Throttling & Controls**: Configurable sends per minute (1–60) with instant Pause/Resume/Cancel controls.
+
+---
+
+### 5. Bi-Directional Google Sheets Sync
+Push qualified prospect lists directly into client or team Google Spreadsheets via official Google Sheets API v4.
+
+<!-- 📸 SCREENSHOT: docs/images/sheets-sync.png -->
+<p align="center">
+  <img src="docs/images/sheets-sync.png" alt="Google Sheets Sync Dialog" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+- Automatic worksheet creation named after the campaign.
+- Pre-checks existing Place IDs in the destination tab to prevent duplicate rows.
+- Full sync history log with direct clickable spreadsheet URLs.
+
+---
+
+### 6. Smart CSV Importer & Normalization
+Import raw business lists from external sources or databases.
+
+<!-- 📸 SCREENSHOT: docs/images/csv-importer.png -->
+<p align="center">
+  <img src="docs/images/csv-importer.png" alt="CSV Importer Column Detection" width="900" style="border-radius: 10px; border: 1px solid #1e293b;" />
+</p>
+
+- Fuzzy header mapping auto-identifies `Business Name`, `Email`, `Phone`, `City`, and `Website`.
+- Automatic phone/email sanitation and contact person extraction.
+- Immediately assigns imported leads to target campaigns with live scoring.
 
 ---
 
@@ -86,251 +149,280 @@ Traditional B2B prospecting relies on expensive data subscriptions, messy manual
 ```mermaid
 flowchart TD
     subgraph Client ["Frontend Layer (React 18 + Vite + Tailwind CSS)"]
-        UI[AntiGravity Dashboard]
-        LF[Lead Discovery]
+        UI[Duo Systems Dashboard]
+        LF[Lead Discovery View]
         CAMP[Campaign Manager]
-        MLE[Manual Lead Entry]
+        CRM[Lead CRM & Drawer]
+        OUT[Gmail Outreach Hub]
         IMP[CSV Normalizer & Importer]
-        CRM[Lead CRM & Filters]
-        EXP[Sheets & CSV Export Hub]
+        SHEETS[Google Sheets Hub]
     end
 
-    subgraph Server ["Application Backend (FastAPI + SQLAlchemy)"]
-        ROUTER[REST API Endpoints]
+    subgraph Server ["Backend API (FastAPI + SQLAlchemy)"]
+        ROUTER[FastAPI APIRouter]
         PLACES[Google Places Service]
-        PARSER[CSV Normalization Engine]
-        SCORING[Multi-Factor Scoring Engine]
-        DEDUP[Place ID Deduplicator]
-        SHEETS_SVC[Google Sheets Sync Service]
-        DB_LAYER[(SQLite / PostgreSQL Database)]
+        SCRAPER[Email Scraper Engine]
+        SCORING[Transparent Scoring Service]
+        WORKER[Background Email Queue Worker]
+        GMAIL_SVC[Gmail OAuth Service]
+        SHEETS_SVC[Google Sheets API Service]
+        DB[(SQLite / PostgreSQL)]
     end
 
-    subgraph External ["External Services & APIs"]
-        G_PLACES[Google Places API New]
+    subgraph External ["External Services"]
+        G_PLACES[Google Places API (New)]
+        G_MAIL[Gmail REST API]
         G_SHEETS[Google Sheets API v4]
-        LOCAL_CSV[Local CSV Download]
     end
 
     UI --> ROUTER
-    LF -->|Search Query| ROUTER
-    CAMP -->|Manage Campaigns| ROUTER
-    MLE -->|Create Lead| ROUTER
-    IMP -->|Upload CSV| ROUTER
-    EXP -->|Download CSV / Sync| ROUTER
+    LF --> ROUTER
+    CAMP --> ROUTER
+    CRM --> ROUTER
+    OUT --> ROUTER
+    IMP --> ROUTER
+    SHEETS --> ROUTER
 
     ROUTER --> PLACES
-    ROUTER --> PARSER
+    ROUTER --> SCRAPER
     ROUTER --> SCORING
+    ROUTER --> WORKER
+    ROUTER --> GMAIL_SVC
     ROUTER --> SHEETS_SVC
 
-    PLACES -->|Text Search & Details| G_PLACES
-    PLACES --> DEDUP
-    PARSER --> DEDUP
-    DEDUP --> DB_LAYER
-    SCORING --> DB_LAYER
+    PLACES --> G_PLACES
+    GMAIL_SVC --> G_MAIL
+    WORKER --> GMAIL_SVC
+    SHEETS_SVC --> G_SHEETS
 
-    SHEETS_SVC -->|Deduplicated Append| G_SHEETS
-    ROUTER -->|Stream CSV| LOCAL_CSV
+    ROUTER --> DB
+    WORKER --> DB
 ```
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer | Technologies |
-| :--- | :--- |
-| **Frontend Framework** | React 18, TypeScript, Vite 5, Tailwind CSS |
-| **Icons & UI** | Lucide React, Glassmorphism Slate-950 UI System |
-| **Backend Framework** | FastAPI (Python 3.11 / 3.12), Pydantic v2, Uvicorn |
-| **Database & ORM** | SQLAlchemy 2.0, SQLite (default) / PostgreSQL (production ready) |
-| **External Integrations** | Google Places API (New), Google Sheets API v4 (OAuth 2.0) |
-| **Data Processing** | Python CSV Streaming, Fuzzy Column Matching, Regex Data Sanitizers |
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | React 18, TypeScript, Vite 5 | Reactive Single Page Application |
+| **Styling** | Tailwind CSS 3.4 | Dark glassmorphism slate-950 design system |
+| **Icons** | Lucide React | High-clarity vector UI iconography |
+| **Backend** | FastAPI (Python 3.11 / 3.12) | Asynchronous, OpenAPI-documented REST backend |
+| **ORM / Database** | SQLAlchemy 2.0, SQLite / PostgreSQL | Relational models with cascade deletion |
+| **Async Tasks** | Python `asyncio` Task Workers | In-memory throttling queues for email workflows |
+| **Google APIs** | `google-api-python-client`, `google-auth` | OAuth 2.0 Gmail & Google Sheets integrations |
+| **HTTP Client** | `httpx` | High-throughput asynchronous HTTP operations |
 
 ---
 
-## 📦 Prerequisites
+## 🚀 Quick Start (Local Setup)
 
-- **Python**: Version `3.11` or `3.12` installed.
-- **Node.js**: Version `18.x` or `20.x` with `npm`.
-- **Google Cloud Console Account**: With Places API (New) and Google Sheets API enabled (optional: demo mode available out of the box).
-
----
-
-## 🚀 Quick Start
+### Prerequisites
+- **Python**: Version `3.11` or `3.12`
+- **Node.js**: Version `18.x` or `20.x` with `npm`
 
 ### 1. Clone the Repository
-
 ```bash
-git clone https://github.com/pk1519/campaign.git
-cd campaign
+git clone https://github.com/pk1519/OutreachOS.git
+cd OutreachOS
 ```
 
 ### 2. Configure Backend Environment
-
-Create `backend/.env` with your settings:
-
 ```bash
 cd backend
 cp .env.example .env
 ```
+*(Optional: Add your Google Cloud credentials to `.env`. Leave empty to run with built-in high-fidelity simulation).*
 
-Edit `backend/.env`:
-```env
-GOOGLE_PLACES_API_KEY=AIzaSyYourGooglePlacesKeyHere
-GOOGLE_CLIENT_ID=your-google-oauth-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
-ENABLE_DEMO_SIMULATION=true
-DATABASE_URL=sqlite:///./duo_leads.db
-```
-
-### 3. Install Backend Dependencies & Start Server
-
+### 3. Start Backend Server
 ```bash
+# Set up Python virtual environment
 python -m venv venv
+
 # Windows:
 .\venv\Scripts\activate
-# Linux/macOS:
+# macOS/Linux:
 # source venv/bin/activate
 
 pip install -r requirements.txt
-uvicorn app.main:app --port 8000 --reload
+python -m uvicorn app.main:app --port 8000 --reload
 ```
+*Backend runs at `http://127.0.0.1:8000` (Swagger docs: `http://127.0.0.1:8000/docs`).*
 
-*The API is now running at `http://127.0.0.1:8000` (Swagger docs: `http://127.0.0.1:8000/docs`).*
-
-### 4. Install Frontend Dependencies & Start App
-
+### 4. Start Frontend Client
 In a separate terminal:
-
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-
-*The frontend application is now running at `http://127.0.0.1:5173`.*
+*Frontend runs at `http://localhost:5173`.*
 
 ---
 
-## 🐳 Docker Deployment
+## 🌐 Zero-Cost 24/7 Production Deployment
 
-Run the complete AntiGravity stack using Docker Compose:
+Follow this architecture to host the application **100% free**, with **zero cold starts**, and **prevent the backend from sleeping**:
 
-```bash
-# Build and run containers in detached mode
-docker-compose up -d --build
-
-# View real-time logs
-docker-compose logs -f
-
-# Shut down stack
-docker-compose down
+```
+[ Frontend: React / Vite ]  ──►  Vercel (Free Global Edge CDN, Never Sleeps)
+[ Backend: FastAPI / Python] ──►  Render.com (Free Web Service)
+[ Keep-Alive Heartbeat ]    ──►  UptimeRobot (Pings /health every 5 mins to prevent idle sleep)
 ```
 
+### Step 1: Deploy Backend to Render (Deploy First)
+1. Push code to GitHub.
+2. Sign in to [Render.com](https://render.com) and click **New +** $\rightarrow$ **Web Service**.
+3. Link your GitHub repository and set:
+   - **Root Directory:** `backend`
+   - **Runtime:** `Python 3`
+   - **Build Command:** `pip install -r requirements.txt`
+   - **Start Command:** `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+   - **Instance Type:** `Free`
+4. Under **Environment Variables**, add:
+   - `DATABASE_URL` = `sqlite:///./duo_leads.db` *(or a free [Neon.tech](https://neon.tech) PostgreSQL connection string for permanent persistence)*
+   - `ENABLE_DEMO_SIMULATION` = `true`
+5. Click **Create Web Service** and copy your live URL (e.g. `https://duo-api.onrender.com`).
+
+### Step 2: Deploy Frontend to Vercel (Deploy Second)
+1. Sign in to [Vercel.com](https://vercel.com) and click **Add New...** $\rightarrow$ **Project**.
+2. Select your repository and configure:
+   - **Framework Preset:** `Vite`
+   - **Root Directory:** `frontend`
+   - **Build Command:** `npm run build`
+   - **Output Directory:** `dist`
+3. Under **Environment Variables**, add:
+   - `VITE_API_URL` = `https://duo-api.onrender.com` *(your Render backend URL, without trailing slash)*
+4. Click **Deploy**. *(The included `frontend/vercel.json` ensures full SPA client-side routing support without 404s).*
+
+### Step 3: Prevent Backend Sleep (UptimeRobot)
+1. Sign in to [UptimeRobot.com](https://uptimerobot.com) (free).
+2. Click **Add New Monitor**:
+   - **Monitor Type:** `HTTP(s)`
+   - **URL:** `https://duo-api.onrender.com/health`
+   - **Monitoring Interval:** `Every 5 minutes`
+3. **Result:** UptimeRobot pings `/health` 24/7 so Render never spins down, giving users **instant sub-second responses with zero cold starts**.
+
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configuration & Environment Variables
 
-| Variable | Default | Description |
-| :--- | :--- | :--- |
-| `GOOGLE_PLACES_API_KEY` | `""` | Google Cloud API key restricted to Places API (New) |
-| `GOOGLE_CLIENT_ID` | `""` | OAuth 2.0 Client ID for Google Sheets authorization |
-| `GOOGLE_CLIENT_SECRET` | `""` | OAuth 2.0 Client Secret for Google Sheets authorization |
-| `ENABLE_DEMO_SIMULATION`| `true` | Falls back to realistic lead generation if Places key is empty |
-| `DATABASE_URL` | `sqlite:///./duo_leads.db` | Database connection string (SQLite or PostgreSQL) |
-| `MAX_AREAS_PER_SEARCH` | `10` | Safety limit on sub-areas evaluated per search |
-| `MAX_RESULTS_PER_SEARCH`| `60` | Maximum businesses retrieved per single query execution |
-| `VITE_API_URL` (Frontend) | `""` (proxied) | Production backend URL when deploying frontend on Vercel |
+| Variable | Scope | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `GOOGLE_PLACES_API_KEY` | Backend | `""` | Google Cloud Places API (New) key |
+| `GOOGLE_CLIENT_ID` | Backend | `""` | Google Cloud OAuth Client ID |
+| `GOOGLE_CLIENT_SECRET` | Backend | `""` | Google Cloud OAuth Client Secret |
+| `ENABLE_DEMO_SIMULATION`| Backend | `true` | Enables high-fidelity simulation if API key is not supplied |
+| `DATABASE_URL` | Backend | `sqlite:///./duo_leads.db` | SQLAlchemy database URI (SQLite or PostgreSQL) |
+| `MAX_AREAS_PER_SEARCH` | Backend | `10` | Safety cap on sub-districts per discovery search |
+| `VITE_API_URL` | Frontend | `""` (proxied) | Production backend origin when hosting frontend on Vercel |
 
 ---
 
 ## 📡 API Reference
 
-### 🔍 Lead Discovery
-- `POST /api/search` — Discover commercial leads by category, city, country, and sub-areas.
-- `GET /api/search/history` — Retrieve previous discovery execution logs and metadata.
-
-### 👥 Leads & CRM
-- `GET /api/leads` — Query paginated leads with campaign, priority, and text search filters.
-- `POST /api/leads` — Add a lead manually with contact person and instant scoring.
-- `PATCH /api/leads/{id}/crm` — Update lead priority, outreach status, follow-up date, and rep notes.
-- `POST /api/leads/export/csv` — Stream RFC-compliant CSV containing selected or all leads.
-- `POST /api/leads/import/detect-columns` — Upload CSV to auto-detect and preview column mappings.
-- `POST /api/leads/import` — Import and score leads from confirmed CSV mappings.
-- `DELETE /api/leads/{id}` — Permanently remove a lead from the database.
+### 🔍 Discovery & Scraping
+- `POST /api/search` — Discover commercial prospects across categories, cities, and sub-areas.
+- `GET /api/search/history` — Retrieve history of previous discovery operations.
 
 ### 📁 Campaigns
-- `GET /api/campaigns` — List all active lead generation campaigns with lead counts.
-- `POST /api/campaigns` — Create a new B2B lead campaign.
-- `GET /api/campaigns/{id}` — Get single campaign details and parameters.
-- `DELETE /api/campaigns/{id}` — Delete a campaign and its lead associations.
+- `GET /api/campaigns` — Fetch all campaigns with lead counts, progress metrics, and statuses.
+- `POST /api/campaigns` — Create a new campaign.
+- `GET /api/campaigns/{id}` — Retrieve detailed configuration for a specific campaign.
+- `PATCH /api/campaigns/{id}` — Update campaign parameters or status.
+- `DELETE /api/campaigns/{id}` — **Complete database purge**: deletes the campaign, associated leads, scores, notes, tags, contacts, messages, recipients, and search records.
+- `POST /api/campaigns/{id}/add-leads` — Batch add lead IDs to a campaign.
+
+### 👥 Leads & CRM
+- `GET /api/leads` — Query paginated leads with full-text search, campaign, score, and status filters.
+- `POST /api/leads` — Create a lead manually with contact person details and instant scoring.
+- `PATCH /api/leads/{id}/crm` — Update lead priority, status, notes, and follow-up timestamps.
+- `DELETE /api/leads/{id}` — Remove a single lead and its child data from the database.
+- `POST /api/leads/export/csv` — Stream an RFC 4180 compliant CSV file of filtered or all leads.
+- `POST /api/leads/import/detect-columns` — Preview uploaded CSV headers and map to standard schema.
+- `POST /api/leads/import` — Ingest and score leads from confirmed CSV mappings.
+
+### ✉️ Outreach & Gmail
+- `GET /api/campaigns/{id}/recipients` — View campaign recipient queue with delivery statuses.
+- `POST /api/campaigns/{id}/validate` — Preflight validate recipients against format, suppression, and duplicate rules.
+- `POST /api/campaigns/{id}/prepare` — Compile personalized templates and queue recipients.
+- `POST /api/campaigns/{id}/test-email` — Send a test email strictly to a designated test recipient.
+- `POST /api/campaigns/{id}/send` — Start background outreach sending worker.
+- `POST /api/campaigns/{id}/pause` — Pause an active background sending queue.
+- `POST /api/campaigns/{id}/resume` — Resume a paused campaign sending queue.
+- `POST /api/campaigns/{id}/cancel` — Cancel an in-flight outreach job.
 
 ### 📊 Google Sheets Sync
-- `GET /api/sheets/status` — Check server-side Google Sheets OAuth connection state.
-- `POST /api/sheets/connect-demo` — Enable instant local demo connection for spreadsheet testing.
-- `POST /api/sheets/export` — Sync campaign leads to Google Sheets with Place ID deduplication.
-- `GET /api/sheets/destinations` — Retrieve history of all synchronized spreadsheets.
-
-### ⚙️ System Settings
-- `GET /api/settings` — Get current system settings and masked API key status.
-- `POST /api/settings` — Update API keys, limits, and simulation preferences.
-- `POST /api/settings/reset-data` — Wipe all leads, campaigns, and search history to start fresh.
+- `GET /api/sheets/status` — Check server-side Google OAuth authorization state.
+- `POST /api/sheets/connect-demo` — Activate local demo connection for spreadsheet testing.
+- `POST /api/sheets/export` — Sync campaign leads to Google Sheets with automatic deduplication.
+- `GET /api/sheets/destinations` — Retrieve sync history and live spreadsheet links.
 
 ---
 
-## 🔄 Core Workflow
+## 🧪 Automated Test Suite
 
-```
-1. Discover Leads (Lead Finder) ──► 2. Score & Deduplicate (0-100) ──► 3. Organize in Campaign
-             ▲                                                                    │
-             │                                                                    ▼
-4. Upload CSV / Manual Entry ────────────────────────────────────────► 5. Export Data
-                                                                          ├── Download CSV
-                                                                          └── Sync to Google Sheets
-```
-
-1. **Lead Discovery**: Enter your business niche (e.g., *"Hostels & PGs"*) and target city (*"Bangalore"*). The system scans sub-districts using Google Places API (New).
-2. **Deterministic Deduplication**: Place IDs ensure identical businesses are never duplicated in the database.
-3. **Transparent Scoring**: Prospects receive a 0–100 score based on operational status, contact availability, ratings, and web presence.
-4. **Campaign Grouping**: Leads are structured into dedicated campaigns for targeted tracking.
-5. **Instant Export**:
-   - Click **Download CSV** on any campaign or lead view for offline analysis or spreadsheet work.
-   - Click **Sync to Google Sheets** to push deduplicated leads directly into a live Google Spreadsheet.
-
----
-
-## 🧪 Testing & Verification
-
-Run the automated verification suite to validate lead discovery, scoring, and CSV generation:
+The repository includes comprehensive automated test coverage across all subsystems:
 
 ```bash
-# Run backend test suite
+# Run complete test suite
 cd backend
-..\venv\Scripts\python.exe -m pytest -v
+..\venv\Scripts\python.exe -m pytest tests/ -v
 
-# Test CSV export endpoint
-..\venv\Scripts\python.exe -c "import requests; r = requests.post('http://127.0.0.1:8000/api/leads/export/csv', json={}); print('Status:', r.status_code, 'Bytes:', len(r.text))"
+# Run campaign cascade purge verification specifically
+..\venv\Scripts\python.exe -m pytest tests/test_campaign_delete_all_data.py -v
 
-# Verify frontend production build
+# Verify frontend production bundle
 cd ../frontend
 cmd /c npm run build
 ```
 
 ---
 
-## 🛡 Security & Compliance
+## 🖼️ Screenshot Guide
 
-- **Backend-Only Secrets**: All Google API keys and OAuth secrets remain strictly on the backend and are never sent to the browser.
-- **Git-Ignored Credentials**: `.env`, `duo_leads.db`, token files, and `secrets/` folders are strictly excluded in `.gitignore`.
-- **Deduplication Safeguards**: Place ID verification prevents redundant writes and ensures idempotency across Google Sheets exports.
-- **Audit Logging**: Every lead import, export, and campaign action is permanently recorded in the `audit_logs` database table.
+To give your repository a visual look, capture and add screenshots to the `docs/images/` folder as outlined below:
+
+### Directory Structure:
+```
+docs/
+└── images/
+    ├── hero-dashboard.png       <-- Main overview of the dashboard
+    ├── lead-finder.png          <-- Lead discovery search & results
+    ├── campaigns.png            <-- Campaigns grid with cards & actions
+    ├── leads-crm.png            <-- Leads table with scores and filters
+    ├── gmail-outreach.png       <-- Outreach template & queue view
+    ├── sheets-sync.png          <-- Google Sheets export modal / sync view
+    └── csv-importer.png         <-- CSV upload & column mapping preview
+```
+
+### What to Capture for Each Image:
+
+| File Name | Page to Capture | What to Show |
+| :--- | :--- | :--- |
+| **`hero-dashboard.png`** | `/` (Dashboard) | The main dashboard with metric cards, recent leads, and quick search. |
+| **`lead-finder.png`** | `/lead-finder` | Search form filled in (e.g. *Gyms in Bangalore*) with multi-area tags and discovered cards. |
+| **`campaigns.png`** | `/campaigns` | Grid of campaign cards showing status badges, lead counts, CSV download, and delete buttons. |
+| **`leads-crm.png`** | `/leads` | The table showing business names, transparent scores (e.g. 85 High), tags, and the contact slide drawer. |
+| **`gmail-outreach.png`** | `/outreach` | Outreach queue showing personalized template preview, preflight stats, and send controls. |
+| **`sheets-sync.png`** | `/google-sheets` | The Google Sheets synchronization dialog or destination history with spreadsheet links. |
+| **`csv-importer.png`** | `/import-csv` | The file uploader showing auto-detected column mappings and data preview. |
+
+### 💡 Tips for High-Quality Screenshots:
+1. **Resolution**: Maximize your browser window (1920x1080 or 1440x900) at 100% zoom.
+2. **Clean Data**: Run a sample search (e.g., *Gyms in Bangalore*) so the tables have populated data.
+3. **Format**: Save as `.png` for crisp text and sharp UI lines.
+4. **Placement**: Put the `.png` files directly inside `docs/images/` with the exact names listed above. GitHub will automatically display them in this README.
 
 ---
 
 ## 📄 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for details.
 
 ---
 
-**Built by Priyanshu / AntiGravity**
+<p align="center">
+  <b>Built by Priyanshu — Duo Systems Lead Finder & Outreach Center</b>
+</p>

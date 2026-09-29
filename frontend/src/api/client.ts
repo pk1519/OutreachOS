@@ -29,7 +29,18 @@ async function handleResponse<T>(res: Response): Promise<T> {
     }
     throw new Error(errMsg);
   }
-  return res.json();
+  if (res.status === 204) {
+    return undefined as unknown as T;
+  }
+  const text = await res.text();
+  if (!text || !text.trim()) {
+    return undefined as unknown as T;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text as unknown as T;
+  }
 }
 
 export const api = {

@@ -11,6 +11,7 @@ from app.schemas.search_schema import SearchRequest, SearchResponseStats, Search
 from app.services.places_service import places_service
 from app.services.lead_service import lead_service
 from app.services.campaign_service import campaign_service
+from app.services.email_scraper_service import email_scraper_service
 
 router = APIRouter(prefix="/search", tags=["Search & Lead Discovery"])
 
@@ -89,6 +90,10 @@ async def discover_leads(req: SearchRequest, db: Session = Depends(get_db)):
             db.add(search_record)
             db.commit()
             raise HTTPException(status_code=500, detail=f"Lead search failed: {str(e)}")
+
+    # Concurrently scrape genuine emails from business websites & domain fallbacks
+    if all_raw_places:
+        await email_scraper_service.enrich_places(all_raw_places)
 
     # Deduplicate and save leads with Place ID
     raw_count, unique_saved, duplicates_removed = lead_service.process_and_save_places(
